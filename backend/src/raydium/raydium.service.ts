@@ -72,37 +72,32 @@ export class RaydiumService {
 }
 
 async getFilteredPools(params: {
-    poolType?: string;
-    mintFilter?: string;
-    hasReward?: boolean;
-    sortField?: string;
-    sortType?: 'asc' | 'desc';
-    size?: number;
-    nextPageId?: string;
-    mint1?: string;
-    mint2?: string;
-  }): Promise<PoolInfo[]> {
-    try {
-      const query = new URLSearchParams();
+  sortField?: string;
+  sortType?: 'asc' | 'desc';
+  size?: number;
+}): Promise<PoolInfo[]> {
+  try {
+    const query = new URLSearchParams();
 
-      if (params.poolType) query.append('poolType', params.poolType);
-      if (params.mintFilter) query.append('mintFilter', params.mintFilter);
-      if (params.hasReward !== undefined) query.append('hasReward', String(params.hasReward));
-      if (params.sortField) query.append('sortField', params.sortField);
-      if (params.sortType) query.append('sortType', params.sortType);
-      if (params.size) query.append('size', String(params.size));
-      if (params.nextPageId) query.append('nextPageId', params.nextPageId);
-      if (params.mint1) query.append('mint1', params.mint1);
-      if (params.mint2) query.append('mint2', params.mint2);
+    if (params.sortField) query.append('sortField', params.sortField);
+    if (params.sortType) query.append('sortType', params.sortType);
+    if (params.size) query.append('size', String(params.size ?? 50));
 
-      const url = `https://api-v3.raydium.io/pools/info/list-v2?${query.toString()}`;
-      const res = await firstValueFrom(this.http.get(url));
+    const url = `${BASE}/pools/info/list-v2?${query.toString()}`;
+    console.log('📡 Raydium URL:', url);
 
-      const list = res.data?.data?.data ?? [];
-      return list.map(pool => this.mapPool(pool));
-    } catch (err) {
-      throw new HttpException(`Raydium getFilteredPools error: ${err}`, 500);
-    }
+    const res = await firstValueFrom(this.http.get(url));
+    console.log('📥 Raydium Response:', JSON.stringify(res.data, null, 2));
+
+   
+    const list = res.data?.data?.data ?? [];
+    return list.map(pool => this.mapPool(pool));
+
+  } catch (err) {
+    throw new HttpException(`Raydium getFilteredPools error: ${err}`, 500);
   }
+}
+
+
 
 }
